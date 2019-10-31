@@ -11,6 +11,8 @@ if(length(.packagesdev[!.instdev]) > 0) devtools::install_github(.packagesdev[!.
 lapply(.packages, require, character.only=TRUE)
 lapply(basename(.packagesdev), require, character.only=TRUE)
 
+vers = 1
+
 # carl = read.csv("data/cline data template.csv", sep = ";")
 carl = read.csv("baltic_sp_div/data/Baltic_clines.csv")
 carl_sa = read.csv("baltic_sp_div/data/Baltic_clines_sal.csv")
@@ -101,6 +103,7 @@ cline_coef_sp = lapply(seq_along(tar_sp), function(y) {
   df_tmp = data.frame(pars = names(mle.cline.coef[[y]]), val = mle.cline.coef[[y]])
   mutate(df_tmp, species = tar_sp[y])
 })
+
 clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
   geom_vline(xintercept = cline_coef_sp[[1]]$val[cline_coef_sp[[1]]$pars == 'centre'], col='blue', size = 1,
              linetype = 'dashed', alpha = 0.7) +
@@ -113,10 +116,29 @@ clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
 
 dir.create(path = "baltic_sp_div/figures")
 dir.create(path = "baltic_sp_div/tables")
-ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species.svg"), plot=clines_img, width=10, height=8)
-write.csv(x = cline_fit_sp,
-          file = paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species.csv"),
+# ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species_", vers, ".svg"),
+#        plot=clines_img, width=10, height=8)
+# write.csv(x = cline_fit_sp,
+#           file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_", vers, ".csv"),
+#           row.names = FALSE)
+write.csv(x = rbindlist(cline_coef_sp),
+          file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_coef",
+                        vers, ".csv"),
           row.names = FALSE)
 
-# plot(x = cline_fit$position, y = cline_fit$phen_cline, type = "l")
-# with(data = carl, points(km, FST))
+head(carl_sa)
+sal_img = ggplot(data = carl_sa) +
+  geom_point(aes(x = DistEntrance, y = av_salinity)) +
+  theme(rect = element_rect(fill = "transparent")) +
+  xlim(min(cline_fit_sp$position), max(cline_fit_sp$position))
+# ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "salinity.svg"),
+#        plot=sal_img, width=10, height=8, bg = "transparent")
+
+cline_sal_img = clines_img + sal_img + plot_layout(ncol = 1)
+ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "cline_sal_v", vers, ".svg"),
+       plot=cline_sal_img, width=12, height=8)
+
+carl$km
+carl_sa$DistEntrance
+setdiff(carl$km, carl_sa$DistEntrance)
+intersect(carl$km, carl_sa$DistEntrance)
