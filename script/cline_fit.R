@@ -11,7 +11,7 @@ if(length(.packagesdev[!.instdev]) > 0) devtools::install_github(.packagesdev[!.
 lapply(.packages, require, character.only=TRUE)
 lapply(basename(.packagesdev), require, character.only=TRUE)
 
-vers = 1
+vers = 2
 
 # carl = read.csv("data/cline data template.csv", sep = ";")
 carl = read.csv("baltic_sp_div/data/Baltic_clines.csv")
@@ -40,7 +40,7 @@ cline <- function(phen,position,centre,w,left,right,sl,sc,sr){
 }
 
 theta.init <- list(mytilus=list(centre=50,w=150,left=0.1,right=0.8,sl=0.1,sc=0.1,sr=0.1),
-                   cod=list(centre=400,w=150,left=0.005,right=0.9,sl=0.05,sc=0.1,sr=0.1))
+                   cod=list(centre=300,w=50,left=0.005,right=0.9,sl=0.05,sc=0.1,sr=0.1))
 
 # mle2(cline, theta.init, data=list(position=carl[carl$species=="cod", ]$km,
 #                                   phen=carl[carl$species=="cod", ]$rel_fst),
