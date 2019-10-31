@@ -11,13 +11,14 @@ if(length(.packagesdev[!.instdev]) > 0) devtools::install_github(.packagesdev[!.
 lapply(.packages, require, character.only=TRUE)
 lapply(basename(.packagesdev), require, character.only=TRUE)
 
-vers = 2
+vers = 3
 
 # carl = read.csv("data/cline data template.csv", sep = ";")
 carl = read.csv("baltic_sp_div/data/Baltic_clines.csv")
 carl_sa = read.csv("baltic_sp_div/data/Baltic_clines_sal.csv")
 head(carl)
 with(data = carl, plot(km, rel_fst, col=species, pch=19))
+tar_sp = as.character(unique(carl$species))
 
 cline <- function(phen,position,centre,w,left,right,sl,sc,sr){
   
@@ -39,9 +40,11 @@ cline <- function(phen,position,centre,w,left,right,sl,sc,sr){
   
 }
 
-theta.init <- list(mytilus=list(centre=50,w=150,left=0.1,right=0.8,sl=0.1,sc=0.1,sr=0.1),
-                   cod=list(centre=300,w=50,left=0.005,right=0.9,sl=0.05,sc=0.1,sr=0.1))
-
+theta.init <- list(mytilus=list(centre=50,w=150,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+                   cod=list(centre=50,w=150,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1))
+write.csv(x = data.frame(val = unlist(theta.init)),
+          file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_init_val_v",
+                                                                  vers, ".csv"), row.names = TRUE)
 # mle2(cline, theta.init, data=list(position=carl[carl$species=="cod", ]$km,
 #                                   phen=carl[carl$species=="cod", ]$rel_fst),
 #      control=list(parscale=abs(unlist(theta.init))))
@@ -83,7 +86,7 @@ cline_pl <- function(position,centre,w,left,right,sl,sc,sr){
 #                      sc = 0.01, sh = 0.04, sw = 0.07)
 # cline_pl(position = 25, centre = 24.5, w = 54.9, crab = 0.02, wave = 0.61,
 #          sc = 0.01, sh = 0.04, sw = 0.07)
-tar_sp = as.character(unique(carl$species))
+
 cline_fit = lapply(seq_along(mle.cline.coef), function(x) {
   cline_pl(position = seq(from = min(carl[carl$species==tar_sp[x], ]$km),
                           to = max(carl[carl$species==tar_sp[x], ]$km), by = 10), centre = mle.cline.coef[[x]]['centre'],
@@ -122,7 +125,7 @@ dir.create(path = "baltic_sp_div/tables")
 #           file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_", vers, ".csv"),
 #           row.names = FALSE)
 write.csv(x = rbindlist(cline_coef_sp),
-          file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_coef",
+          file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_coef_v",
                         vers, ".csv"),
           row.names = FALSE)
 
@@ -135,7 +138,7 @@ sal_img = ggplot(data = carl_sa) +
 #        plot=sal_img, width=10, height=8, bg = "transparent")
 
 cline_sal_img = clines_img + sal_img + plot_layout(ncol = 1)
-ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "cline_sal_v", vers, ".svg"),
+ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_sal_v", vers, ".svg"),
        plot=cline_sal_img, width=12, height=8)
 
 carl$km
