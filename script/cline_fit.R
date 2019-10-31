@@ -12,8 +12,8 @@ lapply(.packages, require, character.only=TRUE)
 lapply(basename(.packagesdev), require, character.only=TRUE)
 
 # carl = read.csv("data/cline data template.csv", sep = ";")
-carl = read.csv("Baltic_divergence/data/Baltic_clines.csv")
-carl_sa = read.csv("Baltic_divergence/data/Baltic_clines_sal.csv")
+carl = read.csv("baltic_sp_div/data/Baltic_clines.csv")
+carl_sa = read.csv("baltic_sp_div/data/Baltic_clines_sal.csv")
 head(carl)
 with(data = carl, plot(km, rel_fst, col=species, pch=19))
 
@@ -111,11 +111,11 @@ clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
   geom_line(aes(x = position, y = phen_cline), size = 1.2, alpha = 0.7) +
   theme(legend.position="top")
 
-dir.create(path = "Baltic_divergence/figures")
-dir.create(path = "Baltic_divergence/tables")
-ggsave(file=paste0("Baltic_divergence/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species.svg"), plot=clines_img, width=10, height=8)
+dir.create(path = "baltic_sp_div/figures")
+dir.create(path = "baltic_sp_div/tables")
+ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species.svg"), plot=clines_img, width=10, height=8)
 write.csv(x = cline_fit_sp,
-          file = paste0("Baltic_divergence/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species.csv"),
+          file = paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species.csv"),
           row.names = FALSE)
 
 # plot(x = cline_fit$position, y = cline_fit$phen_cline, type = "l")
