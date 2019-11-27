@@ -23,12 +23,21 @@ ggplot(data = carl) +
   scale_color_viridis_d(option = "D") +
   theme_bw() +
   theme(legend.position = "top")
-ggplot(data = carl[carl$species=="Skeletonema",]) +
+
+skel_in = ggplot(data = carl[carl$species=="Skeletonema",]) +
   geom_point(aes(x = km, y = rel_fst, col=species), size=2) +
   scale_color_viridis_d(option = "D") +
   theme_bw() +
   theme(legend.position = "top")
-
+ggsave(file=paste0("baltic_sp_div/figures/baltic_div_skeletonema_data.svg"),
+       plot=skel_in, width=12, height=8)
+idot_in = ggplot(data = carl[carl$species=="Idotea",]) +
+  geom_point(aes(x = km, y = rel_fst, col=species), size=2) +
+  scale_color_viridis_d(option = "D") +
+  theme_bw() +
+  theme(legend.position = "top")
+ggsave(file=paste0("baltic_sp_div/figures/baltic_div_idotea_data.svg"),
+       plot=idot_in, width=12, height=8)
 
 cline <- function(phen,position,centre,w,left,right,sl,sc,sr){
   
