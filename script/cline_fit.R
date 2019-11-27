@@ -11,14 +11,24 @@ if(length(.packagesdev[!.instdev]) > 0) devtools::install_github(.packagesdev[!.
 lapply(.packages, require, character.only=TRUE)
 lapply(basename(.packagesdev), require, character.only=TRUE)
 
-vers = 3
+vers = 4
 
 # carl = read.csv("data/cline data template.csv", sep = ";")
 carl = read.csv("baltic_sp_div/data/Baltic_clines.csv")
 carl_sa = read.csv("baltic_sp_div/data/Baltic_clines_sal.csv")
 head(carl)
-with(data = carl, plot(km, rel_fst, col=species, pch=19))
 tar_sp = as.character(unique(carl$species))
+ggplot(data = carl) +
+  geom_point(aes(x = km, y = rel_fst, col=species), size=2) +
+  scale_color_viridis_d(option = "D") +
+  theme_bw() +
+  theme(legend.position = "top")
+ggplot(data = carl[carl$species=="Skeletonema",]) +
+  geom_point(aes(x = km, y = rel_fst, col=species), size=2) +
+  scale_color_viridis_d(option = "D") +
+  theme_bw() +
+  theme(legend.position = "top")
+
 
 cline <- function(phen,position,centre,w,left,right,sl,sc,sr){
   
@@ -40,8 +50,12 @@ cline <- function(phen,position,centre,w,left,right,sl,sc,sr){
   
 }
 
-theta.init <- list(mytilus=list(centre=50,w=150,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
-                   cod=list(centre=50,w=150,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1))
+theta.init <- list(Mytilus=list(centre=50,w=150,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+                   Cod=list(centre=100,w=450,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+                   Turbot=list(centre=300,w=550,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+                   Idotea=list(centre=10,w=750,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+                   Wrasse=list(centre=700,w=350,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+                   Skeletonema=list(centre=20,w=300,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1))
 write.csv(x = data.frame(val = unlist(theta.init)),
           file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_init_val_v",
                                                                   vers, ".csv"), row.names = TRUE)
@@ -94,27 +108,31 @@ cline_fit = lapply(seq_along(mle.cline.coef), function(x) {
            sl = mle.cline.coef[[x]]['sl'], sc = mle.cline.coef[[x]]['sc'], sr = mle.cline.coef[[x]]['sr'])
 })
 
-lines(x = cline_fit[[1]]$position, y = cline_fit[[1]]$phen_cline, col='red', lwd=3)
-lines(x = cline_fit[[2]]$position, y = cline_fit[[2]]$phen_cline, col='black', lwd=3)
-abline(v = mle.cline.coef[[1]]['centre'], col='red', lty=2)
-abline(v = mle.cline.coef[[2]]['centre'], col='black', lty=2)
+# lines(x = cline_fit[[1]]$position, y = cline_fit[[1]]$phen_cline, col='red', lwd=3)
+# lines(x = cline_fit[[2]]$position, y = cline_fit[[2]]$phen_cline, col='black', lwd=3)
+# abline(v = mle.cline.coef[[1]]['centre'], col='red', lty=2)
+# abline(v = mle.cline.coef[[2]]['centre'], col='black', lty=2)
 
 cline_fit_sp = rbindlist(lapply(seq_along(tar_sp), function(y) {
   mutate(cline_fit[[y]], species = tar_sp[y])
 }))
-cline_coef_sp = lapply(seq_along(tar_sp), function(y) {
+cline_coef_sp = rbindlist(lapply(seq_along(tar_sp), function(y) {
   df_tmp = data.frame(pars = names(mle.cline.coef[[y]]), val = mle.cline.coef[[y]])
   mutate(df_tmp, species = tar_sp[y])
-})
+}))
 
 clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
-  geom_vline(xintercept = cline_coef_sp[[1]]$val[cline_coef_sp[[1]]$pars == 'centre'], col='blue', size = 1,
-             linetype = 'dashed', alpha = 0.7) +
-  geom_vline(xintercept = cline_coef_sp[[2]]$val[cline_coef_sp[[2]]$pars == 'centre'], col='red', size = 1,
-             linetype = 'dashed', alpha = 0.7) +
-  scale_color_manual(values = c('red', 'blue')) +
+  geom_vline(data = cline_coef_sp[cline_coef_sp$pars == 'centre',], aes(xintercept = val, col=species),
+             size = 1, linetype = 'dashed', alpha = 0.7) +
+  # geom_vline(xintercept = cline_coef_sp[[1]]$val[cline_coef_sp[[1]]$pars == 'centre'], col='blue', size = 1,
+  #            linetype = 'dashed', alpha = 0.7) +
+  # geom_vline(xintercept = cline_coef_sp[[2]]$val[cline_coef_sp[[2]]$pars == 'centre'], col='red', size = 1,
+  #            linetype = 'dashed', alpha = 0.7) +
+  # scale_color_manual(values = c('red', 'blue')) +
+  scale_color_viridis_d() +
   geom_point(data = carl, aes(x = km, y = rel_fst), size = 2) +
   geom_line(aes(x = position, y = phen_cline), size = 1.2, alpha = 0.7) +
+  theme_bw() +
   theme(legend.position="top")
 
 dir.create(path = "baltic_sp_div/figures")
@@ -124,7 +142,7 @@ dir.create(path = "baltic_sp_div/tables")
 # write.csv(x = cline_fit_sp,
 #           file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_", vers, ".csv"),
 #           row.names = FALSE)
-write.csv(x = rbindlist(cline_coef_sp),
+write.csv(x = cline_coef_sp,
           file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_coef_v",
                         vers, ".csv"),
           row.names = FALSE)
@@ -141,7 +159,7 @@ cline_sal_img = clines_img + sal_img + plot_layout(ncol = 1)
 ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_sal_v", vers, ".svg"),
        plot=cline_sal_img, width=12, height=8)
 
-carl$km
-carl_sa$DistEntrance
-setdiff(carl$km, carl_sa$DistEntrance)
-intersect(carl$km, carl_sa$DistEntrance)
+# carl$km
+# carl_sa$DistEntrance
+# setdiff(carl$km, carl_sa$DistEntrance)
+# intersect(carl$km, carl_sa$DistEntrance)
