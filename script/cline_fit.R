@@ -1,5 +1,5 @@
 rm(list = ls())
-.packages = c("ggplot2", "dplyr", "rstan", "tibble", "bayesplot", "purrr", "reshape2", "pracma", "viridis", "data.table",
+.packages = c("ggplot2", "dplyr", "tibble", "purrr", "reshape2", "pracma", "viridis", "data.table",
               "Cairo", "extrafont", "ggthemes", "bbmle", "svglite")
 .packagesdev = "thomasp85/patchwork"
 # Install CRAN packages (if not already installed)
@@ -16,13 +16,17 @@ vers = 4
 # carl = read.csv("data/cline data template.csv", sep = ";")
 carl = read.csv("baltic_sp_div/data/Baltic_clines.csv")
 carl_sa = read.csv("baltic_sp_div/data/Baltic_clines_sal.csv")
-head(carl)
-tar_sp = as.character(unique(carl$species))
+# carl = carl[!carl$species == "Skeletonema",]
+# carl = carl[!carl$species == "Macoma",]
+# carl = carl[!carl$species == "Cod",]
+sample_n(carl, size = 10)
+(tar_sp = as.character(unique(carl$species)))
 ggplot(data = carl) +
   geom_point(aes(x = km, y = rel_fst, col=species), size=2) +
-  scale_color_viridis_d(option = "D") +
+  scale_colour_brewer(palette = "Set1") +
+  # scale_color_viridis_d(option = "D") +
   theme_bw() +
-  theme(legend.position = "top")
+  theme(legend.position = "top", legend.title = element_blank())
 
 skel_in = ggplot(data = carl[carl$species=="Skeletonema",]) +
   geom_point(aes(x = km, y = rel_fst, col=species), size=2) +
@@ -37,6 +41,20 @@ idot_in = ggplot(data = carl[carl$species=="Idotea",]) +
   theme_bw() +
   theme(legend.position = "top")
 ggsave(file=paste0("baltic_sp_div/figures/baltic_div_idotea_data.svg"),
+       plot=idot_in, width=12, height=8)
+maco_in = ggplot(data = carl[carl$species=="Macoma",]) +
+  geom_point(aes(x = km, y = rel_fst, col=species), size=2) +
+  scale_color_viridis_d(option = "D") +
+  theme_bw() +
+  theme(legend.position = "top")
+ggsave(file=paste0("baltic_sp_div/figures/baltic_div_macoma_data.svg"),
+       plot=idot_in, width=12, height=8)
+cod_in = ggplot(data = carl[carl$species=="Cod",]) +
+  geom_point(aes(x = km, y = rel_fst, col=species), size=2) +
+  scale_color_viridis_d(option = "D") +
+  theme_bw() +
+  theme(legend.position = "top")
+ggsave(file=paste0("baltic_sp_div/figures/baltic_div_cod_data.svg"),
        plot=idot_in, width=12, height=8)
 
 cline <- function(phen,position,centre,w,left,right,sl,sc,sr){
@@ -60,11 +78,13 @@ cline <- function(phen,position,centre,w,left,right,sl,sc,sr){
 }
 
 theta.init <- list(Mytilus=list(centre=50,w=150,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
-                   Cod=list(centre=100,w=450,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+                   Cod=list(centre=100,w=290,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
                    Turbot=list(centre=300,w=550,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
-                   Idotea=list(centre=10,w=750,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+                   Idotea=list(centre=210,w=490,left=0.3,right=0.9,sl=0.1,sc=0.1,sr=0.1),
                    Wrasse=list(centre=700,w=350,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
-                   Skeletonema=list(centre=20,w=300,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1))
+                   Skeletonema=list(centre=240,w=340,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1),
+                   Herring=list(centre=400,w=400,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+                   Macoma=list(centre=250,w=130,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1))
 write.csv(x = data.frame(val = unlist(theta.init)),
           file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_init_val_v",
                                                                   vers, ".csv"), row.names = TRUE)
@@ -138,11 +158,14 @@ clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
   # geom_vline(xintercept = cline_coef_sp[[2]]$val[cline_coef_sp[[2]]$pars == 'centre'], col='red', size = 1,
   #            linetype = 'dashed', alpha = 0.7) +
   # scale_color_manual(values = c('red', 'blue')) +
-  scale_color_viridis_d() +
+  # scale_color_viridis_d() +
+  scale_colour_brewer(palette = "Set1") +
   geom_point(data = carl, aes(x = km, y = rel_fst), size = 2) +
   geom_line(aes(x = position, y = phen_cline), size = 1.2, alpha = 0.7) +
   theme_bw() +
-  theme(legend.position="top")
+  theme(legend.position="top", legend.title = element_blank(), axis.text.x = element_blank()) +
+  labs(y='Normalized genetic divergence', x='')
+clines_img
 
 dir.create(path = "baltic_sp_div/figures")
 dir.create(path = "baltic_sp_div/tables")
@@ -159,12 +182,23 @@ write.csv(x = cline_coef_sp,
 head(carl_sa)
 sal_img = ggplot(data = carl_sa) +
   geom_point(aes(x = DistEntrance, y = av_salinity)) +
+  # geom_text(data = carl_sa[1:2,], aes(x = DistEntrance, y = 30, label = Loc))  +
+  # geom_text(data = carl_sa[3:6,], aes(x = DistEntrance, y = 33, label = Loc))  +
+  # geom_text(data = carl_sa[7:8,], aes(x = DistEntrance, y = 27, label = Loc))  +
+  # geom_text(data = carl_sa[9,], aes(x = DistEntrance, y = 35, label = Loc))  +
+  # geom_text(data = carl_sa[10:11,], aes(x = DistEntrance, y = 33, label = Loc))  +
+  # geom_text(data = carl_sa[12:16,], aes(x = DistEntrance, y = 27, label = Loc))  +
+  # geom_text(data = carl_sa[16,], aes(x = DistEntrance, y = 35, label = Loc))  +
+  theme_bw() +
   theme(rect = element_rect(fill = "transparent")) +
-  xlim(min(cline_fit_sp$position), max(cline_fit_sp$position))
+  xlim(min(cline_fit_sp$position), max(cline_fit_sp$position)) +
+  labs(y='Average salinity', x='Distance (km)')
+sal_img
 # ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "salinity.svg"),
 #        plot=sal_img, width=10, height=8, bg = "transparent")
 
 cline_sal_img = clines_img + sal_img + plot_layout(ncol = 1)
+cline_sal_img
 ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_sal_v", vers, ".svg"),
        plot=cline_sal_img, width=12, height=8)
 

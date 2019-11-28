@@ -6,6 +6,13 @@
 "Mytilus.sl",0.1
 "Mytilus.sc",0.1
 "Mytilus.sr",0.1
+"Cod.centre",100
+"Cod.w",290
+"Cod.left",0.05
+"Cod.right",0.8
+"Cod.sl",0.1
+"Cod.sc",0.1
+"Cod.sr",0.1
 "Turbot.centre",300
 "Turbot.w",550
 "Turbot.left",0.05
@@ -41,3 +48,10 @@
 "Herring.sl",0.1
 "Herring.sc",0.1
 "Herring.sr",0.1
+"Macoma.centre",250
+"Macoma.w",130
+"Macoma.left",0.1
+"Macoma.right",0.9
+"Macoma.sl",0.1
+"Macoma.sc",0.1
+"Macoma.sr",0.1

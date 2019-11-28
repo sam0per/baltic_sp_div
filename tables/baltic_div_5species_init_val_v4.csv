@@ -14,8 +14,8 @@
 "Turbot.sc",0.1
 "Turbot.sr",0.1
 "Idotea.centre",210
-"Idotea.w",490
-"Idotea.left",0.3
+"Idotea.w",90
+"Idotea.left",0.2
 "Idotea.right",0.9
 "Idotea.sl",0.1
 "Idotea.sc",0.1
@@ -27,13 +27,6 @@
 "Wrasse.sl",0.1
 "Wrasse.sc",0.1
 "Wrasse.sr",0.1
-"Skeletonema.centre",240
-"Skeletonema.w",340
-"Skeletonema.left",0.1
-"Skeletonema.right",0.9
-"Skeletonema.sl",0.1
-"Skeletonema.sc",0.1
-"Skeletonema.sr",0.1
 "Herring.centre",400
 "Herring.w",400
 "Herring.left",0.05
