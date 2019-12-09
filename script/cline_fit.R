@@ -13,7 +13,7 @@ lapply(basename(.packagesdev), require, character.only=TRUE)
 
 vers = 4
 
-spp = 12
+spp = 13
 carl = rbindlist(lapply(1:spp, function(x) {
   read.xls(list.files(path = getwd(), pattern = "edit", full.names = TRUE), sheet = x, header = TRUE)[, 1:6]
 }))
@@ -23,8 +23,8 @@ carl_sa = read.xls(list.files(path = getwd(), pattern = "edit", full.names = TRU
 (tar_sp = as.character(unique(carl$species)))
 lapply(1:spp, function(x) {
   ggplot(data = carl[carl$species==tar_sp[x], ]) +
-    geom_point(aes(x = km, y = rel_fst, col=species), size=2) +
-    scale_colour_brewer(palette = "Set3") +
+    geom_point(aes(x = km, y = rel_fst, col=species), size=3) +
+    # scale_colour_brewer(palette = "Set3") +
     # scale_color_viridis_d(option = "D") +
     theme_bw() +
     theme(legend.position = "top", legend.title = element_blank())
@@ -38,11 +38,11 @@ lapply(1:spp, function(x) {
 # carl = carl[!carl$species == "Cod",]
 
 sample_n(carl, size = 10)
-brewer.pal.info
+# brewer.pal.info
 ggplot(data = carl) +
   geom_point(aes(x = km, y = rel_fst, col=species), size=3) +
   scale_color_manual(values = c("#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
-                                "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000")) +
+                                "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000", "#969696")) +
   # scale_colour_brewer(palette = "Set3") +
   # scale_color_viridis_d(option = "D") +
   theme_bw() +
@@ -120,6 +120,8 @@ gsvalc = -92
 gsvalw = 276
 pvalc = -164
 pvalw = 268
+skvalc = 235
+skvalw = 418
 
 # pvalc = runif(n = 1, min = -200, max = 0)
 # pvalw = runif(n = 1, min = 0, max = 300)
@@ -129,6 +131,8 @@ pvalw = 268
 # ssvalw = runif(n = 1, min = 0, max = 500)
 # gsvalc = runif(n = 1, min = -300, max = -50)
 # gsvalw = runif(n = 1, min = 0, max = 500)
+# skvalc = runif(n = 1, min = 200, max = 500)
+# skvalw = runif(n = 1, min = 0, max = 500)
 
 theta.init <- list(Corkwing_wrasse=list(centre=-700,w=350,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
                    Cod=list(centre=-90,w=100,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1),
@@ -141,8 +145,8 @@ theta.init <- list(Corkwing_wrasse=list(centre=-700,w=350,left=0.05,right=0.8,sl
                    Plaice=list(centre=pvalc,w=pvalw,left=0.1,right=0.8,sl=0.1,sc=0.1,sr=0.1),
                    Dab=list(centre=dvalc,w=dvalw,left=0.1,right=0.85,sl=0.1,sc=0.1,sr=0.1),
                    Small_sandeel=list(centre=ssvalc,w=ssvalw,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1),
-                   Greater_Sandeel=list(centre=gsvalc,w=gsvalw,left=0.1,right=0.85,sl=0.1,sc=0.1,sr=0.1))
-                   # Skeletonema=list(centre=240,w=340,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1))
+                   Greater_Sandeel=list(centre=gsvalc,w=gsvalw,left=0.1,right=0.85,sl=0.1,sc=0.1,sr=0.1),
+                   Skeletonema=list(centre=skvalc,w=skvalw,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1))
 write.csv(x = data.frame(val = unlist(theta.init)),
           file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_init_val_v",
                                                                   vers, ".csv"), row.names = TRUE)
@@ -219,7 +223,7 @@ clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
   # scale_color_manual(values = c('red', 'blue')) +
   # scale_color_viridis_d() +
   scale_color_manual(values = c("#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
-                                "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000")) +
+                                "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000", "#969696")) +
   # scale_colour_brewer(palette = "Paired") +
   geom_point(data = carl, aes(x = km, y = rel_fst), size = 2) +
   geom_line(aes(x = position, y = phen_cline), size = 1.2, alpha = 0.7) +
