@@ -1,6 +1,6 @@
 rm(list = ls())
-.packages = c("ggplot2", "dplyr", "tibble", "purrr", "reshape2", "pracma", "viridis", "data.table",
-              "Cairo", "extrafont", "ggthemes", "bbmle", "svglite", "gdata", "RColorBrewer", "segmented")
+.packages = c("ggplot2", "tibble", "purrr", "reshape2", "pracma", "viridis", "data.table",
+              "Cairo", "extrafont", "ggthemes", "bbmle", "svglite", "gdata", "RColorBrewer", "segmented", "dplyr")
 .packagesdev = "thomasp85/patchwork"
 # Install CRAN packages (if not already installed)
 .inst <- .packages %in% installed.packages()
@@ -11,7 +11,7 @@ if(length(.packagesdev[!.instdev]) > 0) devtools::install_github(.packagesdev[!.
 lapply(.packages, require, character.only=TRUE)
 lapply(basename(.packagesdev), require, character.only=TRUE)
 
-vers = 4
+vers = 5
 
 spp = 13
 carl = rbindlist(lapply(1:spp, function(x) {
@@ -234,6 +234,28 @@ clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
         axis.title.y = element_text(size = 12),
         axis.text = element_text(size = 12)) +
   labs(y='Normalized genetic divergence', x='') +
+  guides(col = guide_legend(nrow = 2))
+clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
+  # geom_vline(data = cline_coef_sp[cline_coef_sp$pars == 'centre',], aes(xintercept = val, col=species),
+  #            size = 1, linetype = 'dashed', alpha = 0.7) +
+  # geom_vline(xintercept = cline_coef_sp[[1]]$val[cline_coef_sp[[1]]$pars == 'centre'], col='blue', size = 1,
+  #            linetype = 'dashed', alpha = 0.7) +
+  # geom_vline(xintercept = cline_coef_sp[[2]]$val[cline_coef_sp[[2]]$pars == 'centre'], col='red', size = 1,
+  #            linetype = 'dashed', alpha = 0.7) +
+  # scale_color_manual(values = c('red', 'blue')) +
+  # scale_color_viridis_d() +
+  scale_color_manual(values = c("#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
+                                "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000", "#969696")) +
+  # scale_colour_brewer(palette = "Paired") +
+  # geom_point(data = carl, aes(x = km, y = rel_fst), size = 2) +
+  geom_line(aes(x = position, y = phen_cline), size = 1.2, alpha = 0.7) +
+  theme_bw() +
+  theme(legend.position="none", legend.title = element_blank(),
+        legend.key.size = unit(0.8, "cm"),
+        legend.text = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        axis.text = element_text(size = 12)) +
+  labs(y='', x='') +
   guides(col = guide_legend(nrow = 2))
 clines_img
 
