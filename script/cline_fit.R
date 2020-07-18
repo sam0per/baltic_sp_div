@@ -11,12 +11,14 @@ if(length(.packagesdev[!.instdev]) > 0) devtools::install_github(.packagesdev[!.
 lapply(.packages, require, character.only=TRUE)
 lapply(basename(.packagesdev), require, character.only=TRUE)
 
-vers = 5
+vers = 6
 
-spp = 13
+spp = 14
 carl = rbindlist(lapply(1:spp, function(x) {
   read.xls(list.files(path = getwd(), pattern = "edit", full.names = TRUE), sheet = x, header = TRUE)[, 1:6]
 }))
+table(carl$species)
+carl[30, ]
 carl = carl[rowSums(is.na(carl)) == 0, ]
 colnames(carl) = c("loc", "wrong_km", "Fst", "km", "rel_fst", "species")
 carl_sa = read.xls(list.files(path = getwd(), pattern = "edit", full.names = TRUE), sheet = spp+1, header = TRUE)
@@ -41,7 +43,7 @@ sample_n(carl, size = 10)
 # brewer.pal.info
 ggplot(data = carl) +
   geom_point(aes(x = km, y = rel_fst, col=species), size=3) +
-  scale_color_manual(values = c("#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
+  scale_color_manual(values = c("#a6cee3", "#c51b7d", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
                                 "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000", "#969696")) +
   # scale_colour_brewer(palette = "Set3") +
   # scale_color_viridis_d(option = "D") +
@@ -135,17 +137,18 @@ skvalw = 418
 # skvalw = runif(n = 1, min = 0, max = 500)
 
 theta.init <- list(Corkwing_wrasse=list(centre=-700,w=350,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
-                   Cod=list(centre=-90,w=100,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1),
+                   Ballan_wrasse=list(centre=1100,w=200,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+                   Atlantic_cod=list(centre=-90,w=100,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1),
                    Herring=list(centre=400,w=400,left=0.05,right=0.95,sl=0.1,sc=0.1,sr=0.1),
                    Turbot=list(centre=300,w=550,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
                    Flounder=list(centre=fvalc,w=fvalw,left=0.1,right=0.8,sl=0.1,sc=0.1,sr=0.1),
                    Mytilus=list(centre=50,w=150,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
                    Macoma=list(centre=150,w=100,left=0.2,right=0.85,sl=0.2,sc=0.1,sr=0.2),
                    Idotea=list(centre=210,w=490,left=0.3,right=0.9,sl=0.1,sc=0.1,sr=0.1),
-                   Plaice=list(centre=pvalc,w=pvalw,left=0.1,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+                   Europ_plaice=list(centre=pvalc,w=pvalw,left=0.1,right=0.8,sl=0.1,sc=0.1,sr=0.1),
                    Dab=list(centre=dvalc,w=dvalw,left=0.1,right=0.85,sl=0.1,sc=0.1,sr=0.1),
                    Small_sandeel=list(centre=ssvalc,w=ssvalw,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1),
-                   Greater_Sandeel=list(centre=gsvalc,w=gsvalw,left=0.1,right=0.85,sl=0.1,sc=0.1,sr=0.1),
+                   Greater_sandeel=list(centre=gsvalc,w=gsvalw,left=0.1,right=0.85,sl=0.1,sc=0.1,sr=0.1),
                    Skeletonema=list(centre=skvalc,w=skvalw,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1))
 write.csv(x = data.frame(val = unlist(theta.init)),
           file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_init_val_v",
@@ -222,7 +225,7 @@ clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
   #            linetype = 'dashed', alpha = 0.7) +
   # scale_color_manual(values = c('red', 'blue')) +
   # scale_color_viridis_d() +
-  scale_color_manual(values = c("#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
+  scale_color_manual(values = c("#a6cee3", "#c51b7d", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
                                 "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000", "#969696")) +
   # scale_colour_brewer(palette = "Paired") +
   geom_point(data = carl, aes(x = km, y = rel_fst), size = 2) +
@@ -299,3 +302,13 @@ ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(ta
 # carl_sa$DistEntrance
 # setdiff(carl$km, carl_sa$DistEntrance)
 # intersect(carl$km, carl_sa$DistEntrance)
+
+# Using the cowplot package
+legend <- cowplot::get_legend(clines_img)
+library(grid)
+library(gridExtra) 
+pdf(file = paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_legends_", vers, ".pdf"),
+    width = 12, height = 4)
+grid.newpage()
+grid.draw(legend)
+dev.off()
