@@ -237,13 +237,14 @@ lapply(1:spp, function(x) {
 out.lm = lapply(1:spp, function(l) {
   lm(y ~ x, data = carl_seg[[l]])
 })
-carl_brk = list(c(500,800), c(400,800), c(1000,2000), c(1000, 1500), c(600), c(300, 700), c(800, 1300),
+carl_brk = list(c(500,800), c(600, 1000), c(400,800), c(1000,2000), c(1000, 1500), c(600), c(300, 700), c(800, 1300),
                 c(400,800), c(250), c(300), c(700,1200), c(450,900), c(800))
 # out.seg = lapply(1:spp, function(l) {
 #   segmented(out.lm[[l]], seg.Z = ~x, psi = list(x = carl_brk[[l]]), npsi = 2,
 #             control = seg.control(display = FALSE))
 # })
-l = 13
+l = 2
+nrow(carl_seg[[l]])
 with(data = carl_seg[[l]], plot(x = x, y = y))
 carl_brk[[l]]
 abline(v = c(carl_brk[[l]][1], carl_brk[[l]][2]))
@@ -271,7 +272,7 @@ AIC(out.seg)
 AIC(mle.cline.m[[l]])
 (dAIC = AIC(mle.cline.m[[l]]) - AIC(out.seg))
 
-seg_np = 5
+seg_np = 7
 (segAIC = (2 * seg_np) - (2 * logLik(out.seg)))
 cli_np = 7
 (cliAIC = (2 * cli_np) - (2 * logLik(mle.cline.m[[l]])))

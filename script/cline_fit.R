@@ -11,7 +11,7 @@ if(length(.packagesdev[!.instdev]) > 0) devtools::install_github(.packagesdev[!.
 lapply(.packages, require, character.only=TRUE)
 lapply(basename(.packagesdev), require, character.only=TRUE)
 
-vers = 6
+vers = 7
 
 spp = 14
 carl = rbindlist(lapply(1:spp, function(x) {
@@ -23,6 +23,7 @@ carl = carl[rowSums(is.na(carl)) == 0, ]
 colnames(carl) = c("loc", "wrong_km", "Fst", "km", "rel_fst", "species")
 carl_sa = read.xls(list.files(path = getwd(), pattern = "edit", full.names = TRUE), sheet = spp+1, header = TRUE)
 (tar_sp = as.character(unique(carl$species)))
+# carl[carl$species=='Ballan_wrasse', 'km'] <- carl[carl$species=='Ballan_wrasse', 'km'] - 2000
 lapply(1:spp, function(x) {
   ggplot(data = carl[carl$species==tar_sp[x], ]) +
     geom_point(aes(x = km, y = rel_fst, col=species), size=3) +
@@ -137,13 +138,13 @@ skvalw = 418
 # skvalw = runif(n = 1, min = 0, max = 500)
 
 theta.init <- list(Corkwing_wrasse=list(centre=-700,w=350,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
-                   Ballan_wrasse=list(centre=1100,w=200,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+                   Ballan_wrasse=list(centre=-900,w=200,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
                    Atlantic_cod=list(centre=-90,w=100,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1),
                    Herring=list(centre=400,w=400,left=0.05,right=0.95,sl=0.1,sc=0.1,sr=0.1),
                    Turbot=list(centre=300,w=550,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
                    Flounder=list(centre=fvalc,w=fvalw,left=0.1,right=0.8,sl=0.1,sc=0.1,sr=0.1),
                    Mytilus=list(centre=50,w=150,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
-                   Macoma=list(centre=150,w=100,left=0.2,right=0.85,sl=0.2,sc=0.1,sr=0.2),
+                   Limecola=list(centre=150,w=100,left=0.2,right=0.85,sl=0.2,sc=0.1,sr=0.2),
                    Idotea=list(centre=210,w=490,left=0.3,right=0.9,sl=0.1,sc=0.1,sr=0.1),
                    Europ_plaice=list(centre=pvalc,w=pvalw,left=0.1,right=0.8,sl=0.1,sc=0.1,sr=0.1),
                    Dab=list(centre=dvalc,w=dvalw,left=0.1,right=0.85,sl=0.1,sc=0.1,sr=0.1),
@@ -238,6 +239,8 @@ clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
         axis.text = element_text(size = 12)) +
   labs(y='Normalized genetic divergence', x='') +
   guides(col = guide_legend(nrow = 2))
+clines_img
+
 clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
   # geom_vline(data = cline_coef_sp[cline_coef_sp$pars == 'centre',], aes(xintercept = val, col=species),
   #            size = 1, linetype = 'dashed', alpha = 0.7) +
@@ -286,7 +289,8 @@ sal_img = ggplot(data = carl_sa) +
   # geom_text(data = carl_sa[16,], aes(x = DistEntrance, y = 35, label = Loc))  +
   theme_bw() +
   theme(rect = element_rect(fill = "transparent"),
-        axis.text = element_text(size = 12)) +
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12)) +
   xlim(min(cline_fit_sp$position), max(cline_fit_sp$position)) +
   labs(y='Average salinity', x='Distance (km)')
 sal_img
@@ -296,6 +300,8 @@ sal_img
 cline_sal_img = clines_img + sal_img + plot_layout(ncol = 1)
 cline_sal_img
 ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_sal_v", vers, ".svg"),
+       plot=cline_sal_img, width=12, height=8)
+ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_sal_v", vers, ".pdf"),
        plot=cline_sal_img, width=12, height=8)
 
 # carl$km
