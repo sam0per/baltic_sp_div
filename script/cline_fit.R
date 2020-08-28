@@ -11,7 +11,7 @@ if(length(.packagesdev[!.instdev]) > 0) devtools::install_github(.packagesdev[!.
 lapply(.packages, require, character.only=TRUE)
 lapply(basename(.packagesdev), require, character.only=TRUE)
 
-vers = 7
+vers = 8
 
 spp = 14
 carl = rbindlist(lapply(1:spp, function(x) {
@@ -248,21 +248,21 @@ clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
   #            linetype = 'dashed', alpha = 0.7) +
   # geom_vline(xintercept = cline_coef_sp[[2]]$val[cline_coef_sp[[2]]$pars == 'centre'], col='red', size = 1,
   #            linetype = 'dashed', alpha = 0.7) +
-  # scale_color_manual(values = c('red', 'blue')) +
-  # scale_color_viridis_d() +
-  scale_color_manual(values = c("#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
+  scale_color_manual(values = c("#a6cee3", "#c51b7d", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
                                 "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000", "#969696")) +
-  # scale_colour_brewer(palette = "Paired") +
+  # scale_color_manual(values = rep("#000000", 14)) +
   # geom_point(data = carl, aes(x = km, y = rel_fst), size = 2) +
   geom_line(aes(x = position, y = phen_cline), size = 1.2, alpha = 0.7) +
-  theme_bw() +
+  # theme_bw() +
   theme(legend.position="none", legend.title = element_blank(),
         legend.key.size = unit(0.8, "cm"),
         legend.text = element_text(size = 12),
         axis.title.y = element_text(size = 12),
-        axis.text = element_text(size = 12)) +
-  labs(y='', x='') +
-  guides(col = guide_legend(nrow = 2))
+        axis.text = element_text(size = 12),
+        panel.background = element_blank(),
+        axis.line = element_line(size = 0.4, linetype = "solid",
+                                 colour = "black")) +
+  labs(y='', x='')
 clines_img
 
 dir.create(path = "baltic_sp_div/figures")
@@ -287,10 +287,13 @@ sal_img = ggplot(data = carl_sa) +
   # geom_text(data = carl_sa[10:11,], aes(x = DistEntrance, y = 33, label = Loc))  +
   # geom_text(data = carl_sa[12:16,], aes(x = DistEntrance, y = 27, label = Loc))  +
   # geom_text(data = carl_sa[16,], aes(x = DistEntrance, y = 35, label = Loc))  +
-  theme_bw() +
+  # theme_bw() +
   theme(rect = element_rect(fill = "transparent"),
         axis.text = element_text(size = 12),
-        axis.title = element_text(size = 12)) +
+        axis.title = element_text(size = 12),
+        panel.background = element_blank(),
+        axis.line = element_line(size = 0.4, linetype = "solid",
+                                 colour = "black")) +
   xlim(min(cline_fit_sp$position), max(cline_fit_sp$position)) +
   labs(y='Average salinity', x='Distance (km)')
 sal_img
