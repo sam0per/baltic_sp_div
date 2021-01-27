@@ -226,8 +226,8 @@ pd$position <- pd$position+round(runif(n = 100, min = 0, max = 10), 3)
 pp <- cline_pl(position = 4:103, centre = 54, w = 25, left = 0.03, right = 0.97, sl = 0.2, sc = 0.2, sr = 0.2)
 
 clp <- ggplot(data = pd) +
-  geom_point(aes(x = position, y = phen_cline), size = 2) +
-  geom_line(data = pp, aes(x = position, y = phen_cline), size = 2, col = " blue") +
+  geom_point(aes(x = position, y = phen_cline), size = 4) +
+  geom_line(data = pp, aes(x = position, y = phen_cline), size = 3, col = " blue") +
   xlim(c(1, 104)) +
   theme_bw() +
   theme(axis.text = element_blank(), axis.title = element_blank())
