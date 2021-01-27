@@ -11,17 +11,24 @@ if(length(.packagesdev[!.instdev]) > 0) devtools::install_github(.packagesdev[!.
 lapply(.packages, require, character.only=TRUE)
 lapply(basename(.packagesdev), require, character.only=TRUE)
 
-vers = 8
+vers = 9
 
 spp = 14
+carl_sa = read.xls(list.files(path = getwd(), pattern = "edit", full.names = TRUE), sheet = spp+1, header = TRUE)
+
 carl = rbindlist(lapply(1:spp, function(x) {
   read.xls(list.files(path = getwd(), pattern = "edit", full.names = TRUE), sheet = x, header = TRUE)[, 1:6]
 }))
-table(carl$species)
+data.frame(table(as.character(carl$species)))
 carl[30, ]
 carl = carl[rowSums(is.na(carl)) == 0, ]
+head(carl)
+
+carl <- carl[!grepl(pattern = "wrasse", x = carl$species), ]
+spp <- nrow(data.frame(table(as.character(carl$species))))
+
 colnames(carl) = c("loc", "wrong_km", "Fst", "km", "rel_fst", "species")
-carl_sa = read.xls(list.files(path = getwd(), pattern = "edit", full.names = TRUE), sheet = spp+1, header = TRUE)
+
 (tar_sp = as.character(unique(carl$species)))
 # carl[carl$species=='Ballan_wrasse', 'km'] <- carl[carl$species=='Ballan_wrasse', 'km'] - 2000
 lapply(1:spp, function(x) {
@@ -44,8 +51,10 @@ sample_n(carl, size = 10)
 # brewer.pal.info
 ggplot(data = carl) +
   geom_point(aes(x = km, y = rel_fst, col=species), size=3) +
-  scale_color_manual(values = c("#a6cee3", "#c51b7d", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
-                                "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000", "#969696")) +
+  # scale_color_manual(values = c("#a6cee3", "#c51b7d", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
+  #                               "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000", "#969696")) +
+  scale_color_manual(values = c("#c51b7d", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
+                                "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000", "#969696")) +
   # scale_colour_brewer(palette = "Set3") +
   # scale_color_viridis_d(option = "D") +
   theme_bw() +
@@ -151,6 +160,20 @@ theta.init <- list(Corkwing_wrasse=list(centre=-700,w=350,left=0.05,right=0.8,sl
                    Small_sandeel=list(centre=ssvalc,w=ssvalw,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1),
                    Greater_sandeel=list(centre=gsvalc,w=gsvalw,left=0.1,right=0.85,sl=0.1,sc=0.1,sr=0.1),
                    Skeletonema=list(centre=skvalc,w=skvalw,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1))
+
+# theta.init <- list(Atlantic_cod=list(centre=-90,w=100,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1),
+#                    Herring=list(centre=400,w=400,left=0.05,right=0.95,sl=0.1,sc=0.1,sr=0.1),
+#                    Turbot=list(centre=300,w=550,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+#                    Flounder=list(centre=fvalc,w=fvalw,left=0.1,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+#                    Mytilus=list(centre=50,w=150,left=0.05,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+#                    Limecola=list(centre=150,w=100,left=0.2,right=0.85,sl=0.2,sc=0.1,sr=0.2),
+#                    Idotea=list(centre=210,w=490,left=0.3,right=0.9,sl=0.1,sc=0.1,sr=0.1),
+#                    Europ_plaice=list(centre=pvalc,w=pvalw,left=0.1,right=0.8,sl=0.1,sc=0.1,sr=0.1),
+#                    Dab=list(centre=dvalc,w=dvalw,left=0.1,right=0.85,sl=0.1,sc=0.1,sr=0.1),
+#                    Small_sandeel=list(centre=ssvalc,w=ssvalw,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1),
+#                    Greater_sandeel=list(centre=gsvalc,w=gsvalw,left=0.1,right=0.85,sl=0.1,sc=0.1,sr=0.1),
+#                    Skeletonema=list(centre=skvalc,w=skvalw,left=0.1,right=0.9,sl=0.1,sc=0.1,sr=0.1))
+
 write.csv(x = data.frame(val = unlist(theta.init)),
           file = paste0("baltic_sp_div/tables/baltic_div_", max(as.integer(factor(tar_sp))), "species_init_val_v",
                                                                   vers, ".csv"), row.names = TRUE)
@@ -226,8 +249,10 @@ clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
   #            linetype = 'dashed', alpha = 0.7) +
   # scale_color_manual(values = c('red', 'blue')) +
   # scale_color_viridis_d() +
-  scale_color_manual(values = c("#a6cee3", "#c51b7d", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
-                                "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000", "#969696")) +
+  # scale_color_manual(values = c("#a6cee3", "#c51b7d", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
+  #                               "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000", "#969696")) +
+  scale_color_manual(values = c("#c51b7d", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c",
+                                "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928", "#000000", "#969696")) +
   # scale_colour_brewer(palette = "Paired") +
   geom_point(data = carl, aes(x = km, y = rel_fst), size = 2) +
   geom_line(aes(x = position, y = phen_cline), size = 1.2, alpha = 0.7) +
@@ -287,11 +312,11 @@ sal_img = ggplot(data = carl_sa) +
   # geom_text(data = carl_sa[10:11,], aes(x = DistEntrance, y = 33, label = Loc))  +
   # geom_text(data = carl_sa[12:16,], aes(x = DistEntrance, y = 27, label = Loc))  +
   # geom_text(data = carl_sa[16,], aes(x = DistEntrance, y = 35, label = Loc))  +
-  # theme_bw() +
+  theme_bw() +
   theme(rect = element_rect(fill = "transparent"),
         axis.text = element_text(size = 12),
         axis.title = element_text(size = 12),
-        panel.background = element_blank(),
+        # panel.background = element_blank(),
         axis.line = element_line(size = 0.4, linetype = "solid",
                                  colour = "black")) +
   xlim(min(cline_fit_sp$position), max(cline_fit_sp$position)) +
@@ -305,7 +330,7 @@ cline_sal_img
 ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_sal_v", vers, ".svg"),
        plot=cline_sal_img, width=12, height=8)
 ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_sal_v", vers, ".pdf"),
-       plot=cline_sal_img, width=12, height=8)
+       plot=cline_sal_img, scale = 0.75, dpi = "screen")
 
 # carl$km
 # carl_sa$DistEntrance
