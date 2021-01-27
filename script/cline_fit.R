@@ -212,6 +212,28 @@ cline_pl <- function(position,centre,w,left,right,sl,sc,sr){
   phen_cline = data.frame(phen_cline = z_x, sd_cline = s_x, position = position)
   return(phen_cline)
 }
+#############
+# TOY CLINE #
+#############
+pd <- cline_pl(position = 1:100, centre = 50, w = 25, left = 0, right = 1, sl = 0.2, sc = 0.2, sr = 0.2)
+
+pd$phen_cline <- pd$phen_cline+round(runif(n = 100, min = 0, max = 0.1), 3)
+max(pd$phen_cline)
+pd$phen_cline <- ifelse(test = pd$phen_cline > 1, yes = pd$phen_cline - 0.090435, no = pd$phen_cline)
+
+pd$position <- pd$position+round(runif(n = 100, min = 0, max = 10), 3)
+
+pp <- cline_pl(position = 4:103, centre = 54, w = 25, left = 0.03, right = 0.97, sl = 0.2, sc = 0.2, sr = 0.2)
+
+clp <- ggplot(data = pd) +
+  geom_point(aes(x = position, y = phen_cline), size = 2) +
+  geom_line(data = pp, aes(x = position, y = phen_cline), size = 2, col = " blue") +
+  xlim(c(1, 104)) +
+  theme_bw() +
+  theme(axis.text = element_blank(), axis.title = element_blank())
+clp
+ggsave(filename = "baltic_sp_div/figures/toy_cline_pl.pdf", plot = clp, scale = 0.7, dpi = "screen")
+
 # range(carl$km)
 # cline_fit = cline_pl(phen = carl$FST, position = carl$km, centre = 24.5, w = 54.9, crab = 0.02, wave = 0.61,
 #                      sc = 0.01, sh = 0.04, sw = 0.07)
@@ -260,9 +282,10 @@ clines_img = ggplot(data = cline_fit_sp, aes(col=species)) +
   theme(legend.position="top", legend.title = element_blank(), axis.text.x = element_blank(),
         legend.key.size = unit(0.8, "cm"),
         legend.text = element_text(size = 12),
-        axis.title.y = element_text(size = 12),
+        axis.title.y = element_text(size = 14),
         axis.text = element_text(size = 12)) +
-  labs(y='Normalized genetic divergence', x='') +
+  # labs(y='Normalized genetic divergence', x='') +
+  labs(y='Genetic divergence', x='') +
   guides(col = guide_legend(nrow = 2))
 clines_img
 
@@ -315,7 +338,7 @@ sal_img = ggplot(data = carl_sa) +
   theme_bw() +
   theme(rect = element_rect(fill = "transparent"),
         axis.text = element_text(size = 12),
-        axis.title = element_text(size = 12),
+        axis.title = element_text(size = 14),
         # panel.background = element_blank(),
         axis.line = element_line(size = 0.4, linetype = "solid",
                                  colour = "black")) +
@@ -330,7 +353,7 @@ cline_sal_img
 ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_sal_v", vers, ".svg"),
        plot=cline_sal_img, width=12, height=8)
 ggsave(file=paste0("baltic_sp_div/figures/baltic_div_", max(as.integer(factor(tar_sp))), "species_cline_sal_v", vers, ".pdf"),
-       plot=cline_sal_img, scale = 0.75, dpi = "screen")
+       plot=cline_sal_img, scale = 0.7, dpi = "screen")
 
 # carl$km
 # carl_sa$DistEntrance
