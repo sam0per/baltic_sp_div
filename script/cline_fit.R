@@ -14,13 +14,14 @@ lapply(basename(.packagesdev), require, character.only=TRUE)
 vers = 9
 
 spp = 14
+# setwd("Documents/Baltic/")
 carl_sa = read.xls(list.files(path = getwd(), pattern = "edit", full.names = TRUE), sheet = spp+1, header = TRUE)
 
 carl = rbindlist(lapply(1:spp, function(x) {
   read.xls(list.files(path = getwd(), pattern = "edit", full.names = TRUE), sheet = x, header = TRUE)[, 1:6]
 }))
 data.frame(table(as.character(carl$species)))
-carl[30, ]
+# carl[30, ]
 carl = carl[rowSums(is.na(carl)) == 0, ]
 head(carl)
 
@@ -215,6 +216,7 @@ cline_pl <- function(position,centre,w,left,right,sl,sc,sr){
 #############
 # TOY CLINE #
 #############
+library(ggplot2)
 pd <- cline_pl(position = 1:100, centre = 50, w = 25, left = 0, right = 1, sl = 0.2, sc = 0.2, sr = 0.2)
 
 pd$phen_cline <- pd$phen_cline+round(runif(n = 100, min = 0, max = 0.1), 3)
@@ -223,17 +225,26 @@ pd$phen_cline <- ifelse(test = pd$phen_cline > 1, yes = pd$phen_cline - 0.090435
 
 pd$position <- pd$position+round(runif(n = 100, min = 0, max = 10), 3)
 
-pp <- cline_pl(position = 4:103, centre = 54, w = 25, left = 0.03, right = 0.97, sl = 0.2, sc = 0.2, sr = 0.2)
+pp <- cline_pl(position = 1:100, centre = 50, w = 5, left = 0.00, right = 1, sl = 0.2, sc = 0.2, sr = 0.2)
+pp$phen_cline2 <- cline_pl(position = 1:100, centre = 40, w = 35, left = 0.4, right = 0.8, sl = 0.2, sc = 0.2, sr = 0.2)[,1]
+pp$phen_cline3 <- cline_pl(position = 1:100, centre = 40, w = 5, left = 0.1, right = 0.3, sl = 0.2, sc = 0.2, sr = 0.2)[,1]
+pp$phen_cline4 <- cline_pl(position = 1:100, centre = 50, w = 15, left = 0.3, right = 0.7, sl = 0.2, sc = 0.2, sr = 0.2)[,1]
 
-clp <- ggplot(data = pd) +
-  geom_point(aes(x = position, y = phen_cline), size = 4) +
-  geom_line(data = pp, aes(x = position, y = phen_cline), size = 3, col = " blue") +
-  xlim(c(1, 104)) +
+clp <- ggplot(data = pp) +
+  geom_vline(xintercept = 50, linetype = "dashed", size = 2, col = "blue") +
+  # geom_point(aes(x = position, y = phen_cline), size = 4) +
+  geom_line(data = pp, aes(x = position, y = phen_cline2), size = 3, col = "grey") +
+  geom_line(data = pp, aes(x = position, y = phen_cline3), size = 3, col = "grey") +
+  geom_line(data = pp, aes(x = position, y = phen_cline), size = 3, col = "blue") +
+  geom_line(data = pp, aes(x = position, y = phen_cline4), size = 3, col = "blue") +
+  # xlim(c(1, 104)) +
   theme_bw() +
   theme(axis.text = element_blank(), axis.title = element_blank())
 clp
 ggsave(filename = "baltic_sp_div/figures/toy_cline_pl.pdf", plot = clp, scale = 0.7, dpi = "screen")
-
+ggsave(filename = "Documents/Baltic/baltic_sp_div/figures/toy_cline_pl_centre.pdf", plot = clp, scale = 0.7, dpi = "screen")
+#############
+#############
 # range(carl$km)
 # cline_fit = cline_pl(phen = carl$FST, position = carl$km, centre = 24.5, w = 54.9, crab = 0.02, wave = 0.61,
 #                      sc = 0.01, sh = 0.04, sw = 0.07)
